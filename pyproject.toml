@@ -19,6 +19,9 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[tool.setuptools.dynamic]
+version = {attr = "chatrag.__version__"}
+
 [project.optional-dependencies]
 dev = [
     "pandas >= 2.1.0"
