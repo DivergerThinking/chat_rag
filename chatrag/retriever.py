@@ -5,7 +5,7 @@ from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.chains.query_constructor.base import AttributeInfo
-from growwpilot.csv_meta_loader import CSVMetaLoader
+from chatrag.csv_meta_loader import CSVMetaLoader
 from typing import Dict, Optional
 
 
