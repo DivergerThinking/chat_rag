@@ -1,24 +1,31 @@
-[tool.poetry]
-name = "chat_rag_csv"
-version = "0.1.0"
-description = ""
-authors = ["itor <itortouch@gmail.com>"]
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.9"
-langchain = "0.0.*"
-openai = "^0.28.0"
-chromadb = "^0.4.9"
-tiktoken = "^0.4.0"
-lark = "^1.1.7"
-
-[tool.poetry.group.dev.dependencies]
-pandas = "^2.1.0"
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chat_rag_csv"
+authors = [
+    {name = "Aitor Mira Abad", email = "itortouch@gmail.com"},
+]
+description = "Package implementing structured RAG+LLM use case."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "langchain == 0.0.*",
+    "openai >= 0.28.0",
+    "chromadb >= 0.4.9",
+    "tiktoken >= 0.4.0",
+    "lark >= 1.1.7"
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+    "pandas >= 2.1.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "chat_rag_csv"}
 
 [tool.ruff]
 line-length = 120
