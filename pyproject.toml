@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "chat_rag_csv"
+name = "chatrag"
 authors = [
     {name = "Aitor Mira Abad", email = "itortouch@gmail.com"},
 ]
