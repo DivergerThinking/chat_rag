@@ -25,7 +25,7 @@ dev = [
 ]
 
 [tool.setuptools]
-package-dir = {"" = "chat_rag_csv"}
+package-dir = {"" = "chatrag"}
 
 [tool.ruff]
 line-length = 120
