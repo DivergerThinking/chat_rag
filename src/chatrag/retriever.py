@@ -42,8 +42,7 @@ def create_retriever_from_csv(
 
 
 def create_retrieval_chain(
-    retriever: SelfQueryRetriever,
-    llm: ChatOpenAI = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", max_tokens=2000),
+    retriever: SelfQueryRetriever, llm: ChatOpenAI = ChatOpenAI(temperature=0, model="gpt-3.5-turbo", max_tokens=2000)
 ):
     template = """Use the following movies data to find the best matches for the user request in the question overview topic. Rules:
     - You can return more than one movie if they are a good match.
@@ -64,9 +63,7 @@ def create_retrieval_chain(
     Movies attending to rules and ordered from best to worst:
     """
 
-    retrieval_prompt = PromptTemplate(
-        template=template, input_variables=["context", "question"]
-    )
+    retrieval_prompt = PromptTemplate(template=template, input_variables=["context", "question"])
 
     media_retriever_chain = RetrievalQA.from_chain_type(
         llm=llm,
