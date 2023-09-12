@@ -22,6 +22,6 @@ The module will be installed in your environment. Make sure you have activated t
 First download the dataset at: \
 https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata
 
-Second, take your OpenAI API key encode it in base64 and place it in a `secrets.txt` under the `data` folder.
+Second, take your OpenAI API key and Organization id, encode it in base64 and place it in a `secrets.json` file under the `data` folder.
 
 Finally, check the notebooks as a guided usage PoC.

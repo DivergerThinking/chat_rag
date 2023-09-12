@@ -4,3 +4,4 @@
 secrets.txt
 chat_rag_csv/chat_rag_csv.egg-info/*
 .vscode/settings.json
+data/secrets.json
