@@ -19,4 +19,9 @@ The module will be installed in your environment. Make sure you have activated t
 
 # Usage:
 
-Check the notebooks as a guided usage PoC.
+First download the dataset at: \
+https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata
+
+Second, take your OpenAI API key encode it in base64 and place it in a `secrets.txt` under the `data` folder.
+
+Finally, check the notebooks as a guided usage PoC.
