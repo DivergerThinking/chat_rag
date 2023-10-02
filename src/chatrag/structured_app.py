@@ -1,8 +1,9 @@
-from chatrag.retriever import create_retriever_from_csv, create_retrieval_chain
-from langchain.chat_models import ChatOpenAI
-import streamlit as st
 import os
 import re
+
+import streamlit as st
+from langchain.chat_models import ChatOpenAI
+from retriever import create_retrieval_chain, create_retriever_from_csv
 
 OPENAI_MODEL_MAP = {":rainbow[GPT-4]": "gpt-4", "***GPT-3.5***": "gpt-3.5-turbo-16k"}
 HTML_BOX_TEMPLATE = """<p style="padding: 0 10px 0 10px; background-color: rgb(240, 242, 246); border-radius: 10px";>
