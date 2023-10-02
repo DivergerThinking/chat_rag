@@ -16,6 +16,7 @@ def create_retriever_from_csv(
     csv_path: str,
     llm: ChatOpenAI,
     metadata_columns_dtypes: Optional[Dict[str, str]] = {"monthly_traffic": "int"},
+    n_docs_to_retrieve: int = 20
 ):
     loader = CSVMetaLoader(csv_path, metadata_columns_dtypes=metadata_columns_dtypes)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=0)
@@ -36,9 +37,9 @@ def create_retriever_from_csv(
         vectorstore=docsearch.vectorstore,
         document_contents=document_content_description,
         metadata_field_info=metadata_field_info,
-        enable_limit=False,
+        enable_limit=False, # TODO: Enable dynamically at func call.
         verbose=True,
-        search_kwargs={"k": 20},
+        search_kwargs={"k": n_docs_to_retrieve},
     )
 
     return retriever
