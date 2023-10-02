@@ -8,8 +8,8 @@ from langchain.prompts import PromptTemplate
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from .csv_meta_loader import CSVMetaLoader
-from .prompts import MOVIE_RETRIEVER_TEMPLATE
+from chatrag.csv_meta_loader import CSVMetaLoader
+from chatrag.prompts import MOVIE_RETRIEVER_TEMPLATE
 
 
 def create_retriever_from_csv(
