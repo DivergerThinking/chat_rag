@@ -38,7 +38,8 @@ Finally, check the notebooks as a guided usage PoC.
 ## Streamlit web app mode
 
 1. Open a terminal and move to the repo directory.
-2. Run the following command:
+2. Run one of the following commands for each app:
 `streamlit run src/chatrag/structured_app.py`
+`streamlit run src/chatrag/structured_chat_app.py`
 3. The web interface will open in your default browser.
 4. Play around and have some fun.
