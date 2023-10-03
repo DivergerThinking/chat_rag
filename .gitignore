@@ -5,3 +5,4 @@ chat_rag_csv/chat_rag_csv.egg-info/*
 .vscode/settings.json
 *secrets*
 data/tmdb_5000_movies.csv
+src/chatrag.egg-info/*
