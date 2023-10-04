@@ -1,10 +1,16 @@
 import os
 import re
+import sys
 
 import streamlit as st
 from langchain.chat_models import ChatOpenAI
-from chatrag.retriever import create_retrieval_chain, create_retriever_from_csv
+
+# Allows streamlit cloud to import self-contained private reopository
+module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(module_path)
+
 from chatrag.react_agent_chat import get_react_chat_agent
+from chatrag.retriever import create_retrieval_chain, create_retriever_from_csv
 
 OPENAI_MODEL_MAP = {":rainbow[GPT-4]": "gpt-4", "***GPT-3.5***": "gpt-3.5-turbo-16k"}
 HTML_BOX_TEMPLATE = """<p style="padding: 0 10px 0 10px; background-color: rgb(240, 242, 246); border-radius: 10px";>
