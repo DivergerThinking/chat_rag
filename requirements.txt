@@ -4,3 +4,4 @@ chromadb >= 0.4.9
 tiktoken >= 0.4.0
 lark >= 1.1.7
 pymupdf >= 1.23.3
+pysqlite3-binary; sys_platform == "linux"
