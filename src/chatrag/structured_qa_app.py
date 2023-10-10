@@ -2,7 +2,8 @@
 import os
 import sys
 import re
-if sys.platform == "linux" or sys.platform == "linux2":
+# Fix for streamlit cloud outdated sqlite version
+if sys.platform == "linux":
     __import__("pysqlite3")
     sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
