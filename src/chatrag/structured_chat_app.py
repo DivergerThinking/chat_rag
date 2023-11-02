@@ -32,7 +32,7 @@ def get_chat_agent():
     llm = ChatOpenAI(
         temperature=0,
         model=st.session_state.openai_model,
-        max_tokens=3500,
+        max_tokens=2000,
         openai_api_key=st.session_state.api_key,
         openai_organization=st.session_state.openai_org_id,
     )

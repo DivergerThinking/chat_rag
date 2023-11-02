@@ -28,4 +28,5 @@ User Data to collect (mandatory):
 
 After succesfully collecting data, you should keep the conversation with the human, answering the questions and requests as good as you can. To do so, you have access to the following tools:""" # noqa
 
-REACT_SUFFIX = """Begin! Your first action must be collect user data and keep it. Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. Respond directly if appropriate. Format is Action:```$JSON_BLOB``` then Observation: ... Thought: ... Action: ...""" # noqa
+REACT_SUFFIX = """Begin! Your first action must ve collect user data and keep it. Reminder to ALWAYS respond with a valid json blob of a single action. Use tools if necessary. Respond directly if appropriate. Format is Action:```$JSON_BLOB```then Observation:.
+Thought:""" # noqa
