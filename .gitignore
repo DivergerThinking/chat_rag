@@ -6,3 +6,4 @@ chat_rag_csv/chat_rag_csv.egg-info/*
 *secrets*
 data/tmdb_5000_movies.csv
 src/chatrag.egg-info/*
+*/wandb/*
