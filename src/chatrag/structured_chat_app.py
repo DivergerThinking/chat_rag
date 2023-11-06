@@ -10,6 +10,8 @@ if sys.platform == "linux":
 
 import streamlit as st
 from langchain.chat_models import ChatOpenAI
+# from langchain.globals import set_debug
+# set_debug(True)
 
 # Allows streamlit cloud to import self-contained private reopository
 module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -40,7 +42,7 @@ def get_chat_agent():
 
     conversation_llm = ChatOpenAI(
         temperature=0.7,
-        model=st.session_state.openai_model,
+        model="gpt-4",
         max_tokens=2000,
         openai_api_key=st.session_state.api_key,
         openai_organization=st.session_state.openai_org_id,
