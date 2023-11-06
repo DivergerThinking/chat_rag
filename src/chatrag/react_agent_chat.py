@@ -19,5 +19,6 @@ def get_react_chat_agent(llm: ChatOpenAI, qa_retriever: BaseRetrievalQA, verbose
         memory=memory,
         verbose=verbose,
         agent_kwargs=agent_kwargs,
+        handle_parsing_errors=True,
     )
     return react_chat_agent
