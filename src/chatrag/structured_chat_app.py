@@ -2,6 +2,7 @@
 import os
 import sys
 import re
+
 # Fix for streamlit cloud outdated sqlite version
 if sys.platform == "linux":
     __import__("pysqlite3")
@@ -29,8 +30,16 @@ def string_to_markdown(text):
 
 
 def get_chat_agent():
-    llm = ChatOpenAI(
-        temperature=0,
+    general_task_llm = ChatOpenAI(
+        temperature=0.7,
+        model=st.session_state.openai_model,
+        max_tokens=2000,
+        openai_api_key=st.session_state.api_key,
+        openai_organization=st.session_state.openai_org_id,
+    )
+
+    conversation_llm = ChatOpenAI(
+        temperature=0.7,
         model=st.session_state.openai_model,
         max_tokens=2000,
         openai_api_key=st.session_state.api_key,
@@ -41,10 +50,10 @@ def get_chat_agent():
     retriever = create_retriever_from_csv(
         csv_path=f"{root_app_directory}/data/movies_title_overview_vote.csv",
         metadata_columns_dtypes={"vote_average": "float"},
-        llm=llm,
+        llm=general_task_llm,
     )
-    sq_retrieval_chain = create_retrieval_chain(retriever=retriever, llm=llm)
-    return get_react_chat_agent(llm, sq_retrieval_chain, verbose=True)
+    sq_retrieval_chain = create_retrieval_chain(retriever=retriever, llm=general_task_llm)
+    return get_react_chat_agent(conversation_llm, sq_retrieval_chain, verbose=True)
 
 
 def app():
