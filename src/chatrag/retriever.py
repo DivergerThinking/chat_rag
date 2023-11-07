@@ -2,7 +2,7 @@ from typing import Dict, Optional
 
 from langchain.chains import RetrievalQA
 from langchain.chains.query_constructor.schema import AttributeInfo
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models.base import BaseChatModel
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.prompts import PromptTemplate
 from langchain.retrievers.self_query.base import SelfQueryRetriever
@@ -14,7 +14,7 @@ from chatrag.prompts import MOVIE_RETRIEVER_TEMPLATE
 
 def create_retriever_from_csv(
     csv_path: str,
-    llm: ChatOpenAI,
+    llm: BaseChatModel,
     metadata_columns_dtypes: Optional[Dict[str, str]] = {"monthly_traffic": "int"},
     n_docs_to_retrieve: int = 20
 ):
@@ -47,7 +47,7 @@ def create_retriever_from_csv(
 
 def create_retrieval_chain(
     retriever: SelfQueryRetriever,
-    llm: ChatOpenAI,
+    llm: BaseChatModel,
     retriever_prompt_template: str = MOVIE_RETRIEVER_TEMPLATE,
 ):
     retrieval_prompt = PromptTemplate(template=retriever_prompt_template, input_variables=["context", "question"])
