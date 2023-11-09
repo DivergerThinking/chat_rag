@@ -35,7 +35,7 @@ def load_creds():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_config(eval(os.environ["gcp_chatrag_client_config"]), SCOPES)
+            flow = InstalledAppFlow.from_client_config(eval(st.secrets["gcp_chatrag_client_config"]), SCOPES)
             creds = flow.run_local_server(port=0)
 
     init_vertexai(project="chatrag", location="europe-west9", credentials=creds)
