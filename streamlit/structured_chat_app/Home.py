@@ -1,5 +1,4 @@
 # ruff: noqa: E402
-import os
 import sys
 
 # Fix for streamlit cloud outdated sqlite version

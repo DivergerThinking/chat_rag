@@ -9,7 +9,6 @@ if sys.platform == "linux":
     sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 import streamlit as st
 from langchain.utilities.vertexai import init_vertexai
@@ -29,27 +28,15 @@ SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
 
 
 def load_creds():
-    """Converts `credentials.json` to a credential object.
-
-    This function caches the generated tokens to minimize the use of the
-    consent screen.
-    """
+    """Converts `gcp_chatrag_client_config env var` to a credential object."""
     creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file("gcp-service-account-key.json", SCOPES)
+            flow = InstalledAppFlow.from_client_config(eval(os.environ["gcp_chatrag_client_config"]), SCOPES)
             creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
 
     init_vertexai(project="chatrag", location="europe-west9", credentials=creds)
     st.session_state.disable_process = False
@@ -68,7 +55,7 @@ def get_chat_agent():
         csv_path=f"{root_app_directory}/data/movies_title_overview_vote.csv",
         metadata_columns_dtypes={"vote_average": "float"},
         llm=llm,
-        embedding_provider="vertexai"
+        embedding_provider="vertexai",
     )
     sq_retrieval_chain = create_retrieval_chain(retriever=retriever, llm=llm)
     return get_react_chat_agent(llm, sq_retrieval_chain, verbose=True)
