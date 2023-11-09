@@ -1,11 +1,11 @@
 from langchain.agents import AgentType, Tool, initialize_agent
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models.base import BaseChatModel
 from langchain.memory import ConversationBufferMemory
 from chatrag.prompts import REACT_PREFIX
 from langchain.chains.retrieval_qa.base import BaseRetrievalQA
 
 
-def get_react_chat_agent(llm: ChatOpenAI, qa_retriever: BaseRetrievalQA, verbose: bool = False):
+def get_react_chat_agent(llm: BaseChatModel, qa_retriever: BaseRetrievalQA, verbose: bool = False):
     retriever_description = """Movie search tool. The action input must be just movie topics and description in a natural language sentence."""  # noqa
     tools = [Tool(name="Search movies", func=qa_retriever.run, description=retriever_description)]
 
