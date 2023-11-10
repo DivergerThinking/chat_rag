@@ -54,6 +54,7 @@ def string_to_markdown(text):
 
 def get_chat_agent():
     llm = ChatVertexAI(model_name="chat-bison", temperature=0.7, max_output_tokens=2000)
+    print("LLM creation worked.")
     retriever = create_retriever_from_csv(
         csv_path=f"{root_app_directory}/data/movies_title_overview_vote.csv",
         metadata_columns_dtypes={"vote_average": "float"},
