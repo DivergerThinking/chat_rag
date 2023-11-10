@@ -2,7 +2,6 @@
 import os
 import sys
 import re
-import webbrowser
 
 # Fix for streamlit cloud outdated sqlite version
 if sys.platform == "linux":
@@ -41,8 +40,7 @@ def load_creds():
                 scopes=SCOPES,
                 redirect_uri="urn:ietf:wg:oauth:2.0:oob",
             )
-            auth_url, _ = flow.authorization_url(prompt="consent")
-            webbrowser.open_new_tab(auth_url)
+            st.session_state.g_auth_url, _ = flow.authorization_url(prompt="consent")
             st.session_state.flow = flow
 
 
@@ -66,6 +64,8 @@ def get_chat_agent():
 
 
 def app():
+    if not hasattr(st.session_state, "g_auth_url"):
+        st.session_state.g_auth_url = ""
     if not hasattr(st.session_state, "g_auth_creds"):
         st.session_state.g_auth_creds = ""
     if not hasattr(st.session_state, "flow"):
@@ -94,10 +94,14 @@ def app():
     st.sidebar.title("Configuración")
     st.sidebar.button("Google login", on_click=load_creds)
     if st.session_state.flow:
+        st.sidebar.markdown("""Visita el link para conseguir el codigo de autorización:<br>
+                                [web de autorización]({})""".format(st.session_state.g_auth_url), unsafe_allow_html=True)
         st.session_state.g_auth_creds = st.sidebar.text_input("Ingrese su código de autorización de google:")
         if st.sidebar.button("Validar"):
             st.session_state.flow.fetch_token(code=st.session_state.g_auth_creds)
             init_vertexai(project="chatrag", location="europe-west9", credentials=st.session_state.flow.credentials)
+            ChatVertexAI(model_name="chat-bison", temperature=0.7, max_output_tokens=2000)
+            print("LLM creation worked.")
             st.session_state.disable_process = False
 
     if st.button("Procesar documento y crear el asistente", disabled=st.session_state.disable_process):
