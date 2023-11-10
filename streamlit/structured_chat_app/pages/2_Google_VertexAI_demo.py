@@ -2,6 +2,7 @@
 import os
 import sys
 import re
+import webbrowser
 
 # Fix for streamlit cloud outdated sqlite version
 if sys.platform == "linux":
@@ -9,7 +10,7 @@ if sys.platform == "linux":
     sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
 from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google_auth_oauthlib.flow import Flow
 import streamlit as st
 from langchain.utilities.vertexai import init_vertexai
 from langchain.chat_models import ChatVertexAI
@@ -35,11 +36,14 @@ def load_creds():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_config(eval(st.secrets["gcp_chatrag_client_config"]), SCOPES)
-            creds = flow.run_local_server(port=0)
-
-    init_vertexai(project="chatrag", location="europe-west9", credentials=creds)
-    st.session_state.disable_process = False
+            flow = Flow.from_client_config(
+                client_config=eval(st.secrets["gcp_chatrag_client_config"]),
+                scopes=SCOPES,
+                redirect_uri="urn:ietf:wg:oauth:2.0:oob",
+            )
+            auth_url, _ = flow.authorization_url(prompt="consent")
+            webbrowser.open_new_tab(auth_url)
+            st.session_state.flow = flow
 
 
 def string_to_markdown(text):
@@ -50,7 +54,7 @@ def string_to_markdown(text):
 
 def get_chat_agent():
     llm = ChatVertexAI(model_name="chat-bison", temperature=0.7, max_output_tokens=2000)
-
+    print("LLM creation worked.")
     retriever = create_retriever_from_csv(
         csv_path=f"{root_app_directory}/data/movies_title_overview_vote.csv",
         metadata_columns_dtypes={"vote_average": "float"},
@@ -62,10 +66,10 @@ def get_chat_agent():
 
 
 def app():
-    # if not hasattr(st.session_state, "api_key"):
-    #     st.session_state.api_key = ""
-    # if not hasattr(st.session_state, "openai_org_id"):
-    #     st.session_state.openai_org_id = ""
+    if not hasattr(st.session_state, "g_auth_creds"):
+        st.session_state.g_auth_creds = ""
+    if not hasattr(st.session_state, "flow"):
+        st.session_state.flow = False
     if not hasattr(st.session_state, "disable_process"):
         st.session_state.disable_process = True
     if not hasattr(st.session_state, "disable_chat"):
@@ -89,26 +93,12 @@ def app():
 
     st.sidebar.title("Configuración")
     st.sidebar.button("Google login", on_click=load_creds)
-    # st.session_state.api_key = st.sidebar.text_input("Ingrese su openai api key:")
-    # if st.session_state.api_key:
-    #     st.session_state.disable_process = False
-    #     os.environ["OPENAI_API_KEY"] = st.session_state.api_key
-    # else:
-    #     st.session_state.disable_process = True
-    # st.session_state.openai_org_id = st.sidebar.text_input(
-    #     "Ingrese su openai organization id:", placeholder="Puedes dejarlo vacío"
-    # )
-    # os.environ["OPENAI_ORGANIZATION"] = st.session_state.openai_org_id
-    # radio_model = st.sidebar.radio(
-    #     "Elige qué modelo de OpenAI usar:",
-    #     [":rainbow[GPT-4]", "***GPT-3.5***"],
-    #     captions=[
-    #         "Modelo más potente y caro.",
-    #         "Modelo más barato. Recomendado para tareas de poca complejidad.",
-    #     ],
-    # )
-    # if radio_model is not None:
-    #     st.session_state.openai_model = OPENAI_MODEL_MAP[radio_model]
+    if st.session_state.flow:
+        st.session_state.g_auth_creds = st.sidebar.text_input("Ingrese su código de autorización de google:")
+        if st.sidebar.button("Validar"):
+            st.session_state.flow.fetch_token(code=st.session_state.g_auth_creds)
+            init_vertexai(project="chatrag", location="europe-west9", credentials=st.session_state.flow.credentials)
+            st.session_state.disable_process = False
 
     if st.button("Procesar documento y crear el asistente", disabled=st.session_state.disable_process):
         st.session_state.react_chat = get_chat_agent()
