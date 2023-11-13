@@ -14,7 +14,8 @@ from langchain.chat_models import ChatOpenAI
 # set_debug(True)
 
 # Allows streamlit cloud to import self-contained private reopository
-module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+root_app_directory = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+module_path = f"{root_app_directory}/src"
 sys.path.append(module_path)
 
 from chatrag.react_agent_chat import get_react_chat_agent
@@ -47,7 +48,6 @@ def get_chat_agent():
         openai_api_key=st.session_state.api_key,
         openai_organization=st.session_state.openai_org_id,
     )
-    root_app_directory = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     retriever = create_retriever_from_csv(
         csv_path=f"{root_app_directory}/data/movies_title_overview_vote.csv",

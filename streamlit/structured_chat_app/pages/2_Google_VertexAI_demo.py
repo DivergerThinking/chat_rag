@@ -8,21 +8,40 @@ if sys.platform == "linux":
     __import__("pysqlite3")
     sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import Flow
 import streamlit as st
-from langchain.chat_models import ChatOpenAI
+from langchain.utilities.vertexai import init_vertexai
+from langchain.chat_models import ChatVertexAI
 # from langchain.globals import set_debug
 # set_debug(True)
 
 # Allows streamlit cloud to import self-contained private reopository
-module_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+root_app_directory = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+module_path = f"{root_app_directory}/src"
 sys.path.append(module_path)
 
 from chatrag.react_agent_chat import get_react_chat_agent
 from chatrag.retriever import create_retrieval_chain, create_retriever_from_csv
 
-OPENAI_MODEL_MAP = {":rainbow[GPT-4]": "gpt-4", "***GPT-3.5***": "gpt-3.5-turbo-16k"}
-HTML_BOX_TEMPLATE = """<p style="padding: 0 10px 0 10px; background-color: rgb(240, 242, 246); border-radius: 10px";>
-        {text}</p>"""
+SCOPES = ["https://www.googleapis.com/auth/cloud-platform"]
+
+
+def load_creds():
+    """Converts `gcp_chatrag_client_config env var` to a credential object."""
+    creds = None
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = Flow.from_client_config(
+                client_config=eval(st.secrets["gcp_chatrag_client_config"]),
+                scopes=SCOPES,
+                redirect_uri="urn:ietf:wg:oauth:2.0:oob",
+            )
+            st.session_state.g_auth_url, _ = flow.authorization_url(prompt="consent")
+            st.session_state.flow = flow
 
 
 def string_to_markdown(text):
@@ -32,37 +51,25 @@ def string_to_markdown(text):
 
 
 def get_chat_agent():
-    general_task_llm = ChatOpenAI(
-        temperature=0.7,
-        model=st.session_state.openai_model,
-        max_tokens=2000,
-        openai_api_key=st.session_state.api_key,
-        openai_organization=st.session_state.openai_org_id,
-    )
-
-    conversation_llm = ChatOpenAI(
-        temperature=0.7,
-        model="gpt-4",
-        max_tokens=2000,
-        openai_api_key=st.session_state.api_key,
-        openai_organization=st.session_state.openai_org_id,
-    )
-    root_app_directory = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+    llm = ChatVertexAI(model_name="chat-bison", temperature=0.7, max_output_tokens=2000)
+    print("LLM creation worked.")
     retriever = create_retriever_from_csv(
         csv_path=f"{root_app_directory}/data/movies_title_overview_vote.csv",
         metadata_columns_dtypes={"vote_average": "float"},
-        llm=general_task_llm,
+        llm=llm,
+        embedding_provider="vertexai",
     )
-    sq_retrieval_chain = create_retrieval_chain(retriever=retriever, llm=general_task_llm)
-    return get_react_chat_agent(conversation_llm, sq_retrieval_chain, verbose=True)
+    sq_retrieval_chain = create_retrieval_chain(retriever=retriever, llm=llm)
+    return get_react_chat_agent(llm, sq_retrieval_chain, verbose=True)
 
 
 def app():
-    if not hasattr(st.session_state, "api_key"):
-        st.session_state.api_key = ""
-    if not hasattr(st.session_state, "openai_org_id"):
-        st.session_state.openai_org_id = ""
+    if not hasattr(st.session_state, "g_auth_url"):
+        st.session_state.g_auth_url = ""
+    if not hasattr(st.session_state, "g_auth_creds"):
+        st.session_state.g_auth_creds = ""
+    if not hasattr(st.session_state, "flow"):
+        st.session_state.flow = False
     if not hasattr(st.session_state, "disable_process"):
         st.session_state.disable_process = True
     if not hasattr(st.session_state, "disable_chat"):
@@ -85,26 +92,17 @@ def app():
     )
 
     st.sidebar.title("Configuración")
-    st.session_state.api_key = st.sidebar.text_input("Ingrese su openai api key:")
-    if st.session_state.api_key:
-        st.session_state.disable_process = False
-        os.environ["OPENAI_API_KEY"] = st.session_state.api_key
-    else:
-        st.session_state.disable_process = True
-    st.session_state.openai_org_id = st.sidebar.text_input(
-        "Ingrese su openai organization id:", placeholder="Puedes dejarlo vacío"
-    )
-    os.environ["OPENAI_ORGANIZATION"] = st.session_state.openai_org_id
-    radio_model = st.sidebar.radio(
-        "Elige qué modelo de OpenAI usar:",
-        [":rainbow[GPT-4]", "***GPT-3.5***"],
-        captions=[
-            "Modelo más potente y caro.",
-            "Modelo más barato. Recomendado para tareas de poca complejidad.",
-        ],
-    )
-    if radio_model is not None:
-        st.session_state.openai_model = OPENAI_MODEL_MAP[radio_model]
+    st.sidebar.button("Google login", on_click=load_creds)
+    if st.session_state.flow:
+        st.sidebar.markdown("""Visita el link para conseguir el codigo de autorización:<br>
+                                [web de autorización]({})""".format(st.session_state.g_auth_url), unsafe_allow_html=True)
+        st.session_state.g_auth_creds = st.sidebar.text_input("Ingrese su código de autorización de google:")
+        if st.sidebar.button("Validar"):
+            st.session_state.flow.fetch_token(code=st.session_state.g_auth_creds)
+            init_vertexai(project="chatrag", location="europe-west9", credentials=st.session_state.flow.credentials)
+            ChatVertexAI(model_name="chat-bison", temperature=0.7, max_output_tokens=2000)
+            print("LLM creation worked.")
+            st.session_state.disable_process = False
 
     if st.button("Procesar documento y crear el asistente", disabled=st.session_state.disable_process):
         st.session_state.react_chat = get_chat_agent()
@@ -119,11 +117,6 @@ def app():
         st.chat_message(msg["role"]).write(msg["content"])
 
     if prompt := st.chat_input(disabled=st.session_state.disable_chat):
-        # if not openai_api_key:
-        #     st.info("Please add your OpenAI API key to continue.")
-        #     st.stop()
-
-        # openai.api_key = openai_api_key
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.chat_message("user").write(prompt)
         response_msg = st.session_state.react_chat.run(input=prompt)
