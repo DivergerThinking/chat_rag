@@ -24,14 +24,15 @@ The module will be installed in your environment. Make sure you have activated t
 # Usage:
 
 ## Notebook mode
-First download the dataset at: \
-https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata
-
-Second, take your OpenAI API key and Organization id, encode it in base64 and place it in a `secrets.json` file under the `data` folder. The json should have this format:
-
-```json
-{"openai_api_key": "yourapikey", "organization_id": "yourorgid"}
+For the OpenAI demos, you just need to set a `.env` file on the root directory with the openai_api_key and org id. Exmaple:
 ```
+OPENAI_API_KEY = yourapikey
+OPENAI_ORGANIZATION = yourorgid
+```
+
+For Google Vertex AI demo you need to provide a credentials.json got from your Google Cloud Platform account. Check how at:
+- retriever_agent_react_poc_gcp.ipynb
+- confluence doc
 
 Finally, check the notebooks as a guided usage PoC.
 
@@ -40,6 +41,6 @@ Finally, check the notebooks as a guided usage PoC.
 1. Open a terminal and move to the repo directory.
 2. Run one of the following commands for each app:
 `streamlit run src/chatrag/structured_qa_app.py`
-`streamlit run src/chatrag/structured_chat_app.py`
+`streamlit run streamlit/structured_chat_app/Home.py`
 3. The web interface will open in your default browser.
 4. Play around and have some fun.
