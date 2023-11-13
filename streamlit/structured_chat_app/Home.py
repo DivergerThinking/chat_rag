@@ -25,7 +25,7 @@ def app():
         unsafe_allow_html=True,
     )
 
-    st.sidebar.title("Selecciona una demo para empezar.")
+    st.sidebar.title("Selecciona una demo para empezar")
 
 
 if __name__ == "__main__":
