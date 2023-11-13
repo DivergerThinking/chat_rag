@@ -1,7 +1,8 @@
 # ruff: noqa: E402
+import logging
 import os
-import sys
 import re
+import sys
 
 # Fix for streamlit cloud outdated sqlite version
 if sys.platform == "linux":
@@ -10,9 +11,11 @@ if sys.platform == "linux":
 
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import Flow
-import streamlit as st
-from langchain.utilities.vertexai import init_vertexai
 from langchain.chat_models import ChatVertexAI
+from langchain.utilities.vertexai import init_vertexai
+
+import streamlit as st
+
 # from langchain.globals import set_debug
 # set_debug(True)
 
@@ -52,7 +55,7 @@ def string_to_markdown(text):
 
 def get_chat_agent():
     llm = ChatVertexAI(model_name="chat-bison", temperature=0.7, max_output_tokens=2000)
-    print("LLM creation worked.")
+    logging.info("LLM creation worked.")
     retriever = create_retriever_from_csv(
         csv_path=f"{root_app_directory}/data/movies_title_overview_vote.csv",
         metadata_columns_dtypes={"vote_average": "float"},
@@ -100,8 +103,6 @@ def app():
         if st.sidebar.button("Validar"):
             st.session_state.flow.fetch_token(code=st.session_state.g_auth_creds)
             init_vertexai(project="chatrag", location="europe-west9", credentials=st.session_state.flow.credentials)
-            ChatVertexAI(model_name="chat-bison", temperature=0.7, max_output_tokens=2000)
-            print("LLM creation worked.")
             st.session_state.disable_process = False
 
     if st.button("Procesar documento y crear el asistente", disabled=st.session_state.disable_process):

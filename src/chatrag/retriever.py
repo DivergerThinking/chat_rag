@@ -1,15 +1,16 @@
 from typing import Dict, Optional
 
+from chromadb.errors import InvalidDimensionException
 from langchain.chains import RetrievalQA
 from langchain.chains.query_constructor.schema import AttributeInfo
 from langchain.chat_models.base import BaseChatModel
+from langchain.embeddings import VertexAIEmbeddings
+from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.prompts import PromptTemplate
 from langchain.retrievers.self_query.base import SelfQueryRetriever
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.embeddings import VertexAIEmbeddings
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.schema.embeddings import Embeddings
+from langchain.vectorstores.chroma import Chroma
 
 from chatrag.csv_meta_loader import CSVMetaLoader
 from chatrag.prompts import MOVIE_RETRIEVER_TEMPLATE
@@ -31,7 +32,11 @@ def create_retriever_from_csv(
     loader = CSVMetaLoader(csv_path, metadata_columns_dtypes=metadata_columns_dtypes)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=5000, chunk_overlap=0)
     index_creator = VectorstoreIndexCreator(text_splitter=text_splitter, embedding=embedding)
-    docsearch = index_creator.from_loaders([loader])
+    try:
+        docsearch = index_creator.from_loaders([loader])
+    except InvalidDimensionException:
+        Chroma().delete_collection()
+        docsearch = index_creator.from_loaders([loader])
 
     metadata_field_info = [
         AttributeInfo(
@@ -47,7 +52,7 @@ def create_retriever_from_csv(
         vectorstore=docsearch.vectorstore,
         document_contents=document_content_description,
         metadata_field_info=metadata_field_info,
-        enable_limit=False, # TODO: Enable dynamically at func call.
+        enable_limit=False,  # TODO: Enable dynamically at func call.
         verbose=True,
         search_kwargs={"k": n_docs_to_retrieve},
     )
