@@ -22,9 +22,13 @@ def create_retriever_from_csv(
     metadata_columns_dtypes: Optional[Dict[str, str]] = {"monthly_traffic": "int"},
     n_docs_to_retrieve: int = 20,
     embedding_provider: str = "openai",
+    embedding_deployment: Optional[str] = None
 ):
     if embedding_provider is None or embedding_provider == "openai":
-        embedding = OpenAIEmbeddings()
+        if embedding_deployment:
+            embedding = OpenAIEmbeddings(deployment=embedding_deployment)
+        else:
+            embedding = OpenAIEmbeddings()
     elif embedding_provider == "vertexai":
         embedding = VertexAIEmbeddings()
     else:
