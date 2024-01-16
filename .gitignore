@@ -9,3 +9,5 @@ src/chatrag.egg-info/*
 */wandb/*
 .env
 gcp*.json
+*/.ragatouille/*
+build/*
