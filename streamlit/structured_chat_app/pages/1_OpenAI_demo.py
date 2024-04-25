@@ -23,9 +23,8 @@ sys.path.append(module_path)
 from chatrag.movie_agent import movie_agent
 from chatrag.tools import create_movie_search_tool_from_csv
 from chatrag.prompts import MOVIE_CHATBOT_TEMPLATE
-from dotenv import load_dotenv
 
-load_dotenv()
+os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 OPENAI_MODEL_MAP = {":rainbow[GPT-4]": "gpt-4-turbo", "***GPT-3.5***": "gpt-3.5-turbo-0125"}
 HTML_BOX_TEMPLATE = """<p style="padding: 0 10px 0 10px; background-color: rgb(240, 242, 246); border-radius: 10px";>
