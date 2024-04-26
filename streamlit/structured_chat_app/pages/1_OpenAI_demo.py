@@ -73,7 +73,7 @@ def app():
         st.session_state.disable_process = False
         st.session_state.openai_model = OPENAI_MODEL_MAP[radio_model]
 
-    if st.button("Click para Procesar documento y empezar a hablar con el asistente (puede tardar unos segundos)", disabled=st.session_state.disable_process):
+    if st.button("Click aquí para procesar el documento y empezar a hablar con el asistente (puede tardar unos segundos)", disabled=st.session_state.disable_process):
         st.session_state.movie_tool_dict = create_movie_search_tool_from_csv(
             csv_path=f"{root_app_directory}/data/movies_title_overview_vote.csv",
             metadata_columns_dtypes={"vote_average": "float"},
