@@ -13,7 +13,7 @@ from openai import OpenAI
 import logging
 
 # set logging level to info
-logging.getLogger("openai").setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Allows streamlit cloud to import self-contained private reopository
 root_app_directory = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
