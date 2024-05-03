@@ -105,7 +105,6 @@ def app():
         )
         st.session_state.messages.append({"role": "assistant", "content": response_msg})
         st.chat_message("assistant").write(response_msg)
-        print(st.session_state["system_prompt"] + st.session_state.messages)
 
 
 if __name__ == "__main__":
