@@ -79,7 +79,7 @@ def app():
             metadata_columns_dtypes={"vote_average": "float"},
         )
         st.session_state.openai_client = OpenAI()
-        st.session_state.react_chat = movie_agent
+        st.session_state.movie_agent = movie_agent
         st.session_state.disable_chat = False
         st.session_state["messages"] = [
             {
@@ -97,7 +97,7 @@ def app():
     ):
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.chat_message("user").write(prompt)
-        response_msg = st.session_state.react_chat(
+        response_msg = st.session_state.movie_agent(
             history=st.session_state["system_prompt"] + st.session_state.messages,
             oai_client=st.session_state.openai_client,
             tool_name_dict=st.session_state.movie_tool_dict,
